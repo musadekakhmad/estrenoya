@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import MovieCard from './MovieCard'; // Import komponen MovieCard yang baru
+import MovieCard from './MovieCard'; // Import the new MovieCard component
 
-// Kunci API tidak diperlukan di sini karena kita menggunakan URL proxy
+// An API key is not needed here as we are using a proxy URL
 const API_KEY = '';
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
@@ -11,8 +11,8 @@ const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 // ===================================
 
 /**
- * Custom hook untuk mengambil data dari API secara efisien.
- * Menggunakan useCallback untuk mencegah re-render yang tidak perlu.
+ * Custom hook to efficiently fetch data from an API.
+ * Uses useCallback to prevent unnecessary re-renders.
  */
 const useFetch = (url) => {
   const [data, setData] = useState(null);
@@ -47,7 +47,7 @@ const useFetch = (url) => {
 };
 
 // ===================================
-// Komponen Halaman Utama
+// Home Page Component
 // ===================================
 const HomePage = () => {
   const { data, loading, error } = useFetch(`${BASE_URL}/movie/popular`);
@@ -57,12 +57,12 @@ const HomePage = () => {
       <div id="hero-section" className="mb-8 rounded-lg overflow-hidden shadow-lg">
           <figure>
               <img
-                  src="https://live.staticflickr.com/65535/54702086138_3eb083fcde_b.jpg"
+                  src="https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg"
                   alt="Estreno Ya Movie Streaming Banner"
                   srcSet="
-                      https://live.staticflickr.com/65535/54702086138_3eb083fcde_b.jpg 1024w,
-                      https://live.staticflickr.com/65535/54702086138_3eb083fcde_b.jpg 500w,
-                      https://live.staticflickr.com/65535/54702086138_3eb083fcde_b.jpg 240w
+                      https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg 1024w,
+                      https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg 500w,
+                      https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg 240w
                   "
                   sizes="(max-width: 600px) 100vw, 1024px"
                   loading="lazy"
@@ -72,25 +72,25 @@ const HomePage = () => {
       </div>
 
       <div className="bg-gray-800 rounded-lg p-6 shadow-lg mb-8">
-        <h1 className="text-3xl font-bold text-white mb-4">Estreno Ya: Streaming Film & Acara TV HD Gratis</h1>
+        <h1 className="text-3xl font-bold text-white mb-4">Estreno Ya: Free HD Movie & TV Show Streaming</h1>
         <p className="text-gray-300 text-justify">
-          Estreno Ya adalah tujuan utama Anda untuk streaming film dan acara TV berkualitas tinggi secara gratis. Jelajahi koleksi ekstensif film populer, film trending, dan serial TV yang paling banyak dibicarakan. Dengan antarmuka yang mudah digunakan dan pemutar video yang lancar, kami memastikan pengalaman menonton yang menyenangkan. Mulai streaming hari ini!
+          Estreno Ya is your premier destination for free, high-quality movie and TV show streaming. Explore an extensive collection of popular films, trending movies, and the most talked-about TV series. With an easy-to-use interface and a smooth video player, we ensure a pleasant viewing experience. Start streaming today!
         </p>
       </div>
 
       <h2 className="text-3xl md:text-4xl font-extrabold text-white mb-6 leading-tight">
-          Film Populer
+          Popular Movies
       </h2>
-      
+
       {loading && (
         <div className="flex justify-center items-center h-64">
           <div className="loading-spinner"></div>
         </div>
       )}
-      
+
       {error && (
         <div className="error-message">
-          <p>Terjadi kesalahan saat mengambil data: {error}. Pastikan Anda memiliki kunci API yang valid dan koneksi internet yang stabil.</p>
+          <p>An error occurred while fetching data: {error}. Please ensure you have a valid API key and a stable internet connection.</p>
         </div>
       )}
 
