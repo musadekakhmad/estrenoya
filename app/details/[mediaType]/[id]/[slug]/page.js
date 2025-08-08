@@ -49,7 +49,7 @@ async function getMediaReviews(mediaType, id) {
 }
 
 const getDirector = (crew) => {
-  return crew.find(member => member.job === 'Director')?.name || 'Tidak diketahui';
+  return crew.find(member => member.job === 'Director')?.name || 'Unknown';
 };
 
 export default async function MediaDetailPage({ params }) {
@@ -93,7 +93,7 @@ export default async function MediaDetailPage({ params }) {
             )}
             
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Detail Film</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Movie Details</h2>
               <div className="flex items-center text-yellow-500 mb-2">
                 <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -137,7 +137,7 @@ export default async function MediaDetailPage({ params }) {
         </div>
         
         <div className="mt-12">
-          <h3 className="text-2xl font-bold text-white mb-2">Sinopsis</h3>
+          <h3 className="text-2xl font-bold text-white mb-2">Synopsis</h3>
           <p className="text-gray-300 leading-relaxed text-justify">{mediaOverview}</p>
         </div>
 
@@ -155,12 +155,12 @@ export default async function MediaDetailPage({ params }) {
               ></iframe>
             </div>
           ) : (
-            <p className="text-gray-500">Tidak ada trailer yang tersedia.</p>
+            <p className="text-gray-500">No trailer available.</p>
           )}
         </div>
 
         <div className="mt-12">
-          <h3 className="text-2xl font-bold text-white mb-4">Mungkin Anda Suka</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">You Might Also Like</h3>
           {similarMovies.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {similarMovies.map(item => (
@@ -168,12 +168,12 @@ export default async function MediaDetailPage({ params }) {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">Tidak ada film serupa yang tersedia.</p>
+            <p className="text-gray-500">No similar movies available.</p>
           )}
         </div>
 
         <div className="mt-12">
-          <h3 className="text-2xl font-bold text-white mb-4">Ulasan Pengguna</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">User Reviews</h3>
           {userReviews.length > 0 ? (
             <div className="space-y-6">
               {userReviews.map(review => (
@@ -189,13 +189,13 @@ export default async function MediaDetailPage({ params }) {
                       </div>
                     )}
                   </div>
-                  <p className="text-gray-400 text-sm italic">Dibuat pada: {new Date(review.created_at).toLocaleDateString()}</p>
-                  <p className="text-gray-300 mt-4 leading-relaxed">{review.content.split(' ').slice(0, 50).join(' ')}... <Link href={review.url} target="_blank" className="text-blue-400 hover:text-blue-300">Baca selengkapnya</Link></p>
+                  <p className="text-gray-400 text-sm italic">Created on: {new Date(review.created_at).toLocaleDateString()}</p>
+                  <p className="text-gray-300 mt-4 leading-relaxed">{review.content.split(' ').slice(0, 50).join(' ')}... <Link href={review.url} target="_blank" className="text-blue-400 hover:text-blue-300">Read more</Link></p>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">Tidak ada ulasan yang tersedia.</p>
+            <p className="text-gray-500">No reviews available.</p>
           )}
         </div>
         
@@ -206,3 +206,4 @@ export default async function MediaDetailPage({ params }) {
     </div>
   );
 }
+
