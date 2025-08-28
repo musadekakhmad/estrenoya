@@ -3,11 +3,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import MovieCard from '@/components/MovieCard';
 import { notFound } from 'next/navigation';
 
-const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- REPLACE WITH YOUR API KEY
+const API_KEY = 'REEMPLAZA CON TU CLAVE DE API'; // <-- REEMPLAZA CON TU CLAVE DE API
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ===================================
-// Main Component
+// Componente principal
 // ===================================
 
 export default function GenrePage({ params }) {
@@ -15,11 +15,11 @@ export default function GenrePage({ params }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [genreName, setGenreName] = useState('Unknown Genre');
+  const [genreName, setGenreName] = useState('Género Desconocido');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  // Function to fetch the genre name
+  // Función para obtener el nombre del género
   const fetchGenreName = useCallback(async () => {
     try {
       const res = await fetch(`${BASE_URL}/genre/${mediaType}/list?api_key=${API_KEY}`);
@@ -27,14 +27,14 @@ export default function GenrePage({ params }) {
         throw new Error(`Error: ${res.status}`);
       }
       const json = await res.json();
-      const name = json.genres.find(genre => genre.id === parseInt(id))?.name || 'Unknown Genre';
+      const name = json.genres.find(genre => genre.id === parseInt(id))?.name || 'Género Desconocido';
       setGenreName(name);
     } catch (err) {
-      console.error("Fetch genre error:", err);
+      console.error("Error al obtener el género:", err);
     }
   }, [mediaType, id]);
 
-  // Function to fetch media by genre with pagination
+  // Función para obtener medios por género con paginación
   const fetchMediaByGenre = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -48,14 +48,14 @@ export default function GenrePage({ params }) {
       setHasMore(json.page < json.total_pages);
     } catch (err) {
       setError(err.message);
-      console.error("Fetch media error:", err);
+      console.error("Error al obtener los medios:", err);
       notFound();
     } finally {
       setLoading(false);
     }
   }, [mediaType, id, page]);
 
-  // Initial data fetch and genre name fetch
+  // Obtención inicial de datos y del nombre del género
   useEffect(() => {
     fetchGenreName();
     fetchMediaByGenre();
@@ -65,7 +65,7 @@ export default function GenrePage({ params }) {
     setPage(prevPage => prevPage + 1);
   };
 
-  const title = `${mediaType === 'movie' ? 'Movies' : 'TV Shows'} - ${genreName}`;
+  const title = `${mediaType === 'movie' ? 'Películas' : 'Series de TV'} - ${genreName}`;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8">
@@ -73,7 +73,7 @@ export default function GenrePage({ params }) {
         {title}
       </h1>
       
-      {loading && data.length === 0 && <p className="text-center text-gray-400">Loading...</p>}
+      {loading && data.length === 0 && <p className="text-center text-gray-400">Cargando...</p>}
       {error && <p className="text-center text-red-400">Error: {error}</p>}
       
       {data.length > 0 && (
@@ -90,7 +90,7 @@ export default function GenrePage({ params }) {
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors duration-300"
                 disabled={loading}
               >
-                {loading ? 'Loading...' : 'Show More'}
+                {loading ? 'Cargando...' : 'Mostrar más'}
               </button>
             </div>
           )}
