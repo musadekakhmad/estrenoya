@@ -75,14 +75,17 @@ const useFetchCategories = (categories) => {
     }
   }, []);
 
-  // Efek untuk mengambil data awal
+  // Efek untuk mengambil data awal secara berurutan
   useEffect(() => {
-    categories.forEach(cat => {
-        const key = `${cat.mediaType}_${cat.category}`;
-        if (!categoryData[key] || categoryData[key].data.length === 0) {
-            fetchData(cat, 1);
+    const fetchAllCategories = async () => {
+        for (const cat of categories) {
+            const key = `${cat.mediaType}_${cat.category}`;
+            if (!categoryData[key] || categoryData[key].data.length === 0) {
+                await fetchData(cat, 1);
+            }
         }
-    });
+    };
+    fetchAllCategories();
   }, [categories]); // Hanya jalankan sekali saat komponen dipasang
 
   // Handler untuk tombol "Mostrar Más"
