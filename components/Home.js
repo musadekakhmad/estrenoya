@@ -3,12 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import MovieCard from '@/components/MovieCard';
 
-// Base URL para la API
-const API_KEY = 'REEMPLAZA CON TU CLAVE DE API'; // <-- REEMPLAZA CON TU CLAVE DE API
+// Base URL untuk API
+const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- GANTI DENGAN KUNCI API ANDA
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ===================================
-// Custom Hook para obtener datos de la API
+// Custom Hook untuk mendapatkan data API
 // ===================================
 const useFetch = (initialUrl) => {
   const [data, setData] = useState([]);
@@ -34,7 +34,7 @@ const useFetch = (initialUrl) => {
       setHasMore(json.page < json.total_pages);
     } catch (err) {
       setError(err.message);
-      console.error("Error de obtención:", err);
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
@@ -47,11 +47,11 @@ const useFetch = (initialUrl) => {
     }
   }, [fetchMoreData, page]);
 
-  return { data, loading, error, hasMore, fetchMoreData };
+  return { data, loading, error, hasMore, fetchMoreData, page };
 };
 
 // ===================================
-// Componente Home
+// Komponen Home
 // ===================================
 export default function Home() {
   const popularMovies = useFetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
@@ -66,8 +66,8 @@ export default function Home() {
   const CategorySection = ({ title, hook, mediaType }) => {
     const { data, loading, error, hasMore, fetchMoreData } = hook;
     
-    // Logika untuk menampilkan 6 item pertama dan kemudian 20 item
-    const displayCount = 6 + (hook.page - 1) * 20;
+    // Logic untuk menampilkan 6 item pertama dan kemudian 20 item
+    const displayCount = 6 + (hook.page - 2) * 20;
     const displayData = data.slice(0, displayCount);
 
     const onLoadMore = () => {
@@ -77,7 +77,7 @@ export default function Home() {
     return (
       <section className="mb-12">
         <h2 className="text-3xl font-bold text-white mb-6">{title}</h2>
-        {loading && data.length === 0 && <p className="text-center text-gray-400">Cargando {mediaType === 'movie' ? 'películas' : 'series de TV'}...</p>}
+        {loading && data.length === 0 && <p className="text-center text-gray-400">Memuat {mediaType === 'movie' ? 'film' : 'serial TV'}...</p>}
         {error && <p className="text-center text-red-400">Error: {error}</p>}
         {data.length > 0 && (
           <>
@@ -92,7 +92,7 @@ export default function Home() {
                   onClick={onLoadMore}
                   className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg transition-colors duration-300"
                 >
-                  Mostrar más
+                  Tampilkan Lebih Banyak
                 </button>
               </div>
             )}
@@ -104,11 +104,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans">
-      {/* Sección Hero */}
+      {/* Bagian Hero */}
       <div className="relative mt-8 w-full h-48 md:h-64 lg:h-96 overflow-hidden rounded-xl shadow-2xl" suppressHydrationWarning={true}>
         <img
           src="https://live.staticflickr.com/65535/54748591312_9316a1f42a_b.jpg"
-          alt="Banner de Estreno Ya"
+          alt="Spanduk Estreno Ya"
           className="w-full h-full object-cover object-center"
           onError={(e) => {
             e.target.onerror = null;
@@ -117,70 +117,70 @@ export default function Home() {
         />
       </div>
       
-      {/* Contenedor de contenido principal con relleno */}
+      {/* Kontainer konten utama dengan padding */}
       <div className="px-4 md:px-8">
         <h1 className="text-2xl font-bold text-center mt-8 mb-12 text-blue-300 leading-tight md:text-3xl">
-          Estreno Ya: El centro de películas y series de TV gratuitas y de alta calidad para ti.
+          Estreno Ya: Pusat film dan serial TV gratis dan berkualitas tinggi untuk Anda.
         </h1>
 
-        {/* Sección de Películas */}
-        <h2 className="text-4xl font-extrabold text-white mt-8 mb-8 text-center">Películas</h2>
+        {/* Bagian Film */}
+        <h2 className="text-4xl font-extrabold text-white mt-8 mb-8 text-center">Film</h2>
 
-        {/* Sección de Películas Populares */}
+        {/* Bagian Film Populer */}
         <CategorySection
-          title="Películas Populares"
+          title="Film Populer"
           hook={popularMovies}
           mediaType="movie"
         />
 
-        {/* Sección de Películas Mejor Valoradas */}
+        {/* Bagian Film Terbaik */}
         <CategorySection
-          title="Películas Mejor Valoradas"
+          title="Film Terbaik"
           hook={topRatedMovies}
           mediaType="movie"
         />
 
-        {/* Sección de Próximas Películas */}
+        {/* Bagian Film yang Akan Datang */}
         <CategorySection
-          title="Próximas Películas"
+          title="Film yang Akan Datang"
           hook={upcomingMovies}
           mediaType="movie"
         />
         
-        {/* Sección de Películas en Cartelera */}
+        {/* Bagian Film yang Sedang Tayang */}
         <CategorySection
-          title="Películas en Cartelera"
+          title="Film yang Sedang Tayang"
           hook={nowPlayingMovies}
           mediaType="movie"
         />
 
-        {/* Sección de Series de TV */}
-        <h2 className="text-4xl font-extrabold text-white mt-16 mb-8 text-center">Series de TV</h2>
+        {/* Bagian Serial TV */}
+        <h2 className="text-4xl font-extrabold text-white mt-16 mb-8 text-center">Serial TV</h2>
 
-        {/* Sección de Series de TV Populares */}
+        {/* Bagian Serial TV Populer */}
         <CategorySection
-          title="Series de TV Populares"
+          title="Serial TV Populer"
           hook={popularTv}
           mediaType="tv"
         />
 
-        {/* Sección de Series de TV Mejor Valoradas */}
+        {/* Bagian Serial TV Terbaik */}
         <CategorySection
-          title="Series de TV Mejor Valoradas"
+          title="Serial TV Terbaik"
           hook={topRatedTv}
           mediaType="tv"
         />
         
-        {/* Sección de Series de TV en el Aire */}
+        {/* Bagian Serial TV yang Sedang Tayang */}
         <CategorySection
-          title="Series de TV en el Aire"
+          title="Serial TV yang Sedang Tayang"
           hook={onTheAirTv}
           mediaType="tv"
         />
         
-        {/* Sección de Series de TV que se transmiten hoy */}
+        {/* Bagian Serial TV yang Tayang Hari Ini */}
         <CategorySection
-          title="Series de TV que se transmiten hoy"
+          title="Serial TV yang Tayang Hari Ini"
           hook={airingTodayTv}
           mediaType="tv"
         />
