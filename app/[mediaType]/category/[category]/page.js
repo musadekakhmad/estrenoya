@@ -1,7 +1,7 @@
 import MovieCard from '@/components/MovieCard';
 import { notFound } from 'next/navigation';
 
-const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
+const API_KEY = 'tmdb-api-proxy.argoyuwono119.workers.dev'; // <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // Fungsi untuk mendapatkan data berdasarkan jenis media dan kategori
