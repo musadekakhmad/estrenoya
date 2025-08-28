@@ -1,274 +1,158 @@
 // Home.js
 "use client";
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import MovieCard from '@/components/MovieCard';
 
-// URL base para la API
+// URL dasar untuk API
 const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- REEMPLAZAR CON TU CLAVE API
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ===================================
-// Hook Personalizado para obtener datos de la API
+// Hook Kustom untuk Mengelola Fetching Data
 // ===================================
 
-const useFetch = (url) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const useFetchCategories = (categories) => {
+  const [categoryData, setCategoryData] = useState({});
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  // Fungsi untuk mengambil data dari API
+  const fetchData = useCallback(async (cat, page) => {
+    const key = `${cat.mediaType}_${cat.category}`;
+    
+    setCategoryData(prev => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || { data: [], displayCount: 6, currentPage: 0 }),
+        loading: true,
+        error: null,
+      }
+    }));
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(`${BASE_URL}/${cat.mediaType}/${cat.category}?api_key=${API_KEY}&page=${page}`);
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
       const json = await response.json();
       
-      // Actualizar los datos agregando los nuevos resultados
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
+      setCategoryData(prev => {
+        const existingData = prev[key]?.data || [];
+        const newData = json.results || [];
+        
+        // Menggabungkan data yang ada dengan data baru
+        const combinedData = [...existingData, ...newData];
+
+        // Menggunakan Map untuk menghapus duplikat berdasarkan ID item
+        const uniqueDataMap = new Map();
+        combinedData.forEach(item => {
+          uniqueDataMap.set(item.id, item);
+        });
+
+        // Mengonversi kembali Map menjadi array
+        const uniqueData = Array.from(uniqueDataMap.values());
+
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
+            data: uniqueData,
+            hasMore: json.page < json.total_pages,
+            loading: false,
+            currentPage: page,
+          }
+        };
+      });
     } catch (err) {
-      setError(err.message);
       console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
+      setCategoryData(prev => ({
+        ...prev,
+        [key]: {
+          ...(prev[key] || { data: [], displayCount: 6, currentPage: 0 }),
+          error: err.message,
+          loading: false,
+        }
+      }));
     }
-  }, [url]);
+  }, []);
 
+  // Efek untuk mengambil data awal
   useEffect(() => {
-    if (url) {
-      fetchData();
-    }
-  }, [url, fetchData]);
+    categories.forEach(cat => {
+        const key = `${cat.mediaType}_${cat.category}`;
+        if (!categoryData[key] || categoryData[key].data.length === 0) {
+            fetchData(cat, 1);
+        }
+    });
+  }, [categories]); // Hanya jalankan sekali saat komponen dipasang
 
-  return { data, loading, error };
+  // Handler untuk tombol "Mostrar Más"
+  const handleLoadMore = useCallback((cat) => {
+    const key = `${cat.mediaType}_${cat.category}`;
+    const currentPage = (categoryData[key]?.currentPage || 1) + 1;
+    const newDisplayCount = (categoryData[key]?.displayCount || 6) + 20;
+
+    setCategoryData(prev => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        displayCount: newDisplayCount,
+      }
+    }));
+    
+    fetchData(cat, currentPage);
+
+  }, [categoryData, fetchData]);
+
+  // Mengembalikan data dan handler
+  const data = {};
+  const loading = {};
+  const error = {};
+  const hasMore = {};
+  const displayCounts = {};
+
+  Object.keys(categoryData).forEach(key => {
+    data[key] = categoryData[key].data;
+    loading[key] = categoryData[key].loading;
+    error[key] = categoryData[key].error;
+    hasMore[key] = categoryData[key].hasMore;
+    displayCounts[key] = categoryData[key].displayCount;
+  });
+
+  return { data, loading, error, hasMore, handleLoadMore, displayCounts };
 };
 
 // ===================================
-// Componente de Inicio
+// Komponen Utama Halaman
 // ===================================
 
+const movieCategories = [
+  { title: "Películas Populares", category: "popular", mediaType: "movie" },
+  { title: "Películas Mejor Calificadas", category: "top_rated", mediaType: "movie" },
+  { title: "Próximos Estrenos", category: "upcoming", mediaType: "movie" },
+  { title: "En Cartelera Ahora", category: "now_playing", mediaType: "movie" },
+];
+
+const tvCategories = [
+  { title: "Series de TV Populares", category: "popular", mediaType: "tv" },
+  { title: "Series de TV Mejor Calificadas", category: "top_rated", mediaType: "tv" },
+  { title: "Series de TV en el Aire", category: "on_the_air", mediaType: "tv" },
+  { title: "Series de TV Emitiendo Hoy", category: "airing_today", mediaType: "tv" },
+];
+
 export default function Home() {
-  // Estado para Películas Populares
-  const [popularMoviesPage, setPopularMoviesPage] = useState(1);
-  const [popularMoviesData, setPopularMoviesData] = useState([]);
-  const [popularMoviesLoading, setPopularMoviesLoading] = useState(true);
-  const [popularMoviesError, setPopularMoviesError] = useState(null);
-  const [hasMorePopularMovies, setHasMorePopularMovies] = useState(true);
-  const [popularMoviesDisplayCount, setPopularMoviesDisplayCount] = useState(6);
-
-  // Estado para Películas Mejor Calificadas
-  const [topRatedMoviesPage, setTopRatedMoviesPage] = useState(1);
-  const [topRatedMoviesData, setTopRatedMoviesData] = useState([]);
-  const [topRatedMoviesLoading, setTopRatedMoviesLoading] = useState(true);
-  const [topRatedMoviesError, setTopRatedMoviesError] = useState(null);
-  const [hasMoreTopRatedMovies, setHasMoreTopRatedMovies] = useState(true);
-  const [topRatedMoviesDisplayCount, setTopRatedMoviesDisplayCount] = useState(6);
-
-  // Estado para Próximos Estrenos de Películas
-  const [upcomingMoviesPage, setUpcomingMoviesPage] = useState(1);
-  const [upcomingMoviesData, setUpcomingMoviesData] = useState([]);
-  const [upcomingMoviesLoading, setUpcomingMoviesLoading] = useState(true);
-  const [upcomingMoviesError, setUpcomingMoviesError] = useState(null);
-  const [hasMoreUpcomingMovies, setHasMoreUpcomingMovies] = useState(true);
-  const [upcomingMoviesDisplayCount, setUpcomingMoviesDisplayCount] = useState(6);
-
-  // Estado para Películas en cartelera ahora
-  const [nowPlayingMoviesPage, setNowPlayingMoviesPage] = useState(1);
-  const [nowPlayingMoviesData, setNowPlayingMoviesData] = useState([]);
-  const [nowPlayingMoviesLoading, setNowPlayingMoviesLoading] = useState(true);
-  const [nowPlayingMoviesError, setNowPlayingMoviesError] = useState(null);
-  const [hasMoreNowPlayingMovies, setHasMoreNowPlayingMovies] = useState(true);
-  const [nowPlayingMoviesDisplayCount, setNowPlayingMoviesDisplayCount] = useState(6);
-
-  // Estado para Series de TV Populares
-  const [popularTvPage, setPopularTvPage] = useState(1);
-  const [popularTvData, setPopularTvData] = useState([]);
-  const [popularTvLoading, setPopularTvLoading] = useState(true);
-  const [popularTvError, setPopularTvError] = useState(null);
-  const [hasMorePopularTv, setHasMorePopularTv] = useState(true);
-  const [popularTvDisplayCount, setPopularTvDisplayCount] = useState(6);
-
-  // Estado para Series de TV Mejor Calificadas
-  const [topRatedTvPage, setTopRatedTvPage] = useState(1);
-  const [topRatedTvData, setTopRatedTvData] = useState([]);
-  const [topRatedTvLoading, setTopRatedTvLoading] = useState(true);
-  const [topRatedTvError, setTopRatedTvError] = useState(null);
-  const [hasMoreTopRatedTv, setHasMoreTopRatedTv] = useState(true);
-  const [topRatedTvDisplayCount, setTopRatedTvDisplayCount] = useState(6);
-
-  // Estado para Series de TV en el aire
-  const [onTheAirTvPage, setOnTheAirTvPage] = useState(1);
-  const [onTheAirTvData, setOnTheAirTvData] = useState([]);
-  const [onTheAirTvLoading, setOnTheAirTvLoading] = useState(true);
-  const [onTheAirTvError, setOnTheAirTvError] = useState(null);
-  const [hasMoreOnTheAirTv, setHasMoreOnTheAirTv] = useState(true);
-  const [onTheAirTvDisplayCount, setOnTheAirTvDisplayCount] = useState(6);
-
-  // Estado para Series de TV emitiendo hoy
-  const [airingTodayTvPage, setAiringTodayTvPage] = useState(1);
-  const [airingTodayTvData, setAiringTodayTvData] = useState([]);
-  const [airingTodayTvLoading, setAiringTodayTvLoading] = useState(true);
-  const [airingTodayTvError, setAiringTodayTvError] = useState(null);
-  const [hasMoreAiringTodayTv, setHasMoreAiringTodayTv] = useState(true);
-  const [airingTodayTvDisplayCount, setAiringTodayTvDisplayCount] = useState(6);
-
-  // Función para obtener datos para una categoría específica de películas
-  const fetchData = useCallback(async (category, page, setData, setLoading, setError, setHasMore) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${BASE_URL}/movie/${category}?api_key=${API_KEY}&page=${page}`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const json = await response.json();
-      
-      // Actualizar los datos agregando los nuevos resultados
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
-    } catch (err) {
-      setError(err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Función para obtener datos para una categoría específica de TV
-  const fetchTvData = useCallback(async (category, page, setData, setLoading, setError, setHasMore) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${BASE_URL}/tv/${category}?api_key=${API_KEY}&page=${page}`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const json = await response.json();
-      
-      // Actualizar los datos agregando los nuevos resultados
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
-    } catch (err) {
-      setError(err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Obtención inicial de datos al montar el componente
-  useEffect(() => {
-    fetchData('popular', popularMoviesPage, setPopularMoviesData, setPopularMoviesLoading, setPopularMoviesError, setHasMorePopularMovies);
-    fetchData('top_rated', topRatedMoviesPage, setTopRatedMoviesData, setTopRatedMoviesLoading, setTopRatedMoviesError, setHasMoreTopRatedMovies);
-    fetchData('upcoming', upcomingMoviesPage, setUpcomingMoviesData, setUpcomingMoviesLoading, setUpcomingMoviesError, setHasMoreUpcomingMovies);
-    fetchData('now_playing', nowPlayingMoviesPage, setNowPlayingMoviesData, setNowPlayingMoviesLoading, setNowPlayingMoviesError, setHasMoreNowPlayingMovies);
-    fetchTvData('popular', popularTvPage, setPopularTvData, setPopularTvLoading, setPopularTvError, setHasMorePopularTv);
-    fetchTvData('top_rated', topRatedTvPage, setTopRatedTvData, setTopRatedTvLoading, setTopRatedTvError, setHasMoreTopRatedTv);
-    fetchTvData('on_the_air', onTheAirTvPage, setOnTheAirTvData, setOnTheAirTvLoading, setOnTheAirTvError, setHasMoreOnTheAirTv);
-    fetchTvData('airing_today', airingTodayTvPage, setAiringTodayTvData, setAiringTodayTvLoading, setAiringTodayTvError, setHasMoreAiringTodayTv);
-  }, [
-    fetchData,
-    fetchTvData,
-    popularMoviesPage,
-    topRatedMoviesPage,
-    upcomingMoviesPage,
-    nowPlayingMoviesPage,
-    popularTvPage,
-    topRatedTvPage,
-    onTheAirTvPage,
-    airingTodayTvPage
-  ]);
-
-  // Manejar "cargar más" para Películas
-  const handleLoadMorePopularMovies = () => {
-    setPopularMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setPopularMoviesPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreTopRatedMovies = () => {
-    setTopRatedMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setTopRatedMoviesPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreUpcomingMovies = () => {
-    setUpcomingMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setUpcomingMoviesPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreNowPlayingMovies = () => {
-    setNowPlayingMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setNowPlayingMoviesPage(prevPage => prevPage + 1);
-  };
-
-  // Manejar "cargar más" para Series de TV
-  const handleLoadMorePopularTv = () => {
-    setPopularTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setPopularTvPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreTopRatedTv = () => {
-    setTopRatedTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setTopRatedTvPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreOnTheAirTv = () => {
-    setOnTheAirTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setOnTheAirTvPage(prevPage => prevPage + 1);
-  };
-  const handleLoadMoreAiringTodayTv = () => {
-    setAiringTodayTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
-    setAiringTodayTvPage(prevPage => prevPage + 1);
-  };
+  const allCategories = [...movieCategories, ...tvCategories];
+  const { data, loading, error, hasMore, handleLoadMore, displayCounts } = useFetchCategories(allCategories);
 
   const CategorySection = ({ title, data, loading, error, hasMore, onLoadMore, mediaType, displayCount }) => (
     <section className="mb-12">
       <h2 className="text-3xl font-bold text-white mb-6">{title}</h2>
-      {loading && <p className="text-center text-gray-400">Cargando {mediaType === 'movie' ? 'películas' : 'series de TV'}...</p>}
+      {loading && data.length === 0 && <p className="text-center text-gray-400">Cargando {mediaType === 'movie' ? 'películas' : 'series de TV'}...</p>}
       {error && <p className="text-center text-red-400">Error: {error}</p>}
       {data.length > 0 && (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
             {data.filter(item => item.poster_path).slice(0, displayCount).map((item) => (
-              <MovieCard key={item.id} media={item} mediaType={mediaType} />
+              <MovieCard key={`${item.id}-${mediaType}`} media={item} mediaType={mediaType} />
             ))}
           </div>
           {hasMore && (
@@ -301,113 +185,49 @@ export default function Home() {
           />
       </div>
       
-      {/* Contenedor principal de contenido con relleno */}
+      {/* Konten utama */}
       <div className="px-4 md:px-8">
         <h1 className="text-2xl font-bold text-center mt-8 mb-12 text-blue-300 leading-tight md:text-3xl">
           Estreno Ya: El centro para películas y series de TV gratuitas y de alta calidad para ti.
         </h1>
 
-        {/* Sección de Películas */}
+        {/* Bagian Film */}
         <h2 className="text-4xl font-extrabold text-white mt-8 mb-8 text-center">Películas</h2>
+        {movieCategories.map(cat => {
+          const key = `${cat.mediaType}_${cat.category}`;
+          return (
+            <CategorySection
+              key={key}
+              title={cat.title}
+              data={data[key] || []}
+              loading={loading[key]}
+              error={error[key]}
+              hasMore={hasMore[key]}
+              onLoadMore={() => handleLoadMore(cat)}
+              mediaType={cat.mediaType}
+              displayCount={displayCounts[key]}
+            />
+          );
+        })}
 
-        {/* Sección de Películas Populares */}
-        <CategorySection
-          title="Películas Populares"
-          data={popularMoviesData}
-          loading={popularMoviesLoading}
-          error={popularMoviesError}
-          hasMore={hasMorePopularMovies}
-          onLoadMore={handleLoadMorePopularMovies}
-          mediaType="movie"
-          displayCount={popularMoviesDisplayCount}
-        />
-
-        {/* Sección de Películas Mejor Calificadas */}
-        <CategorySection
-          title="Películas Mejor Calificadas"
-          data={topRatedMoviesData}
-          loading={topRatedMoviesLoading}
-          error={topRatedMoviesError}
-          hasMore={hasMoreTopRatedMovies}
-          onLoadMore={handleLoadMoreTopRatedMovies}
-          mediaType="movie"
-          displayCount={topRatedMoviesDisplayCount}
-        />
-
-        {/* Sección de Próximos Estrenos */}
-        <CategorySection
-          title="Próximos Estrenos"
-          data={upcomingMoviesData}
-          loading={upcomingMoviesLoading}
-          error={upcomingMoviesError}
-          hasMore={hasMoreUpcomingMovies}
-          onLoadMore={handleLoadMoreUpcomingMovies}
-          mediaType="movie"
-          displayCount={upcomingMoviesDisplayCount}
-        />
-        
-        {/* Sección de Películas en Cartelera Ahora */}
-        <CategorySection
-          title="En Cartelera Ahora"
-          data={nowPlayingMoviesData}
-          loading={nowPlayingMoviesLoading}
-          error={nowPlayingMoviesError}
-          hasMore={hasMoreNowPlayingMovies}
-          onLoadMore={handleLoadMoreNowPlayingMovies}
-          mediaType="movie"
-          displayCount={nowPlayingMoviesDisplayCount}
-        />
-
-        {/* Sección de Series de TV */}
+        {/* Bagian TV Series */}
         <h2 className="text-4xl font-extrabold text-white mt-16 mb-8 text-center">Series de TV</h2>
-
-        {/* Sección de Series de TV Populares */}
-        <CategorySection
-          title="Series de TV Populares"
-          data={popularTvData}
-          loading={popularTvLoading}
-          error={popularTvError}
-          hasMore={hasMorePopularTv}
-          onLoadMore={handleLoadMorePopularTv}
-          mediaType="tv"
-          displayCount={popularTvDisplayCount}
-        />
-
-        {/* Sección de Series de TV Mejor Calificadas */}
-        <CategorySection
-          title="Series de TV Mejor Calificadas"
-          data={topRatedTvData}
-          loading={topRatedTvLoading}
-          error={topRatedTvError}
-          hasMore={hasMoreTopRatedTv}
-          onLoadMore={handleLoadMoreTopRatedTv}
-          mediaType="tv"
-          displayCount={topRatedTvDisplayCount}
-        />
-        
-        {/* Sección de Series de TV en el Aire */}
-        <CategorySection
-          title="Series de TV en el Aire"
-          data={onTheAirTvData}
-          loading={onTheAirTvLoading}
-          error={onTheAirTvError}
-          hasMore={hasMoreOnTheAirTv}
-          onLoadMore={handleLoadMoreOnTheAirTv}
-          mediaType="tv"
-          displayCount={onTheAirTvDisplayCount}
-        />
-        
-        {/* Sección de Series de TV Emitiendo Hoy */}
-        <CategorySection
-          title="Series de TV Emitiendo Hoy"
-          data={airingTodayTvData}
-          loading={airingTodayTvLoading}
-          error={airingTodayTvError}
-          hasMore={hasMoreAiringTodayTv}
-          onLoadMore={handleLoadMoreAiringTodayTv}
-          mediaType="tv"
-          displayCount={airingTodayTvDisplayCount}
-        />
+        {tvCategories.map(cat => {
+          const key = `${cat.mediaType}_${cat.category}`;
+          return (
+            <CategorySection
+              key={key}
+              title={cat.title}
+              data={data[key] || []}
+              loading={loading[key]}
+              error={error[key]}
+              hasMore={hasMore[key]}
+              onLoadMore={() => handleLoadMore(cat)}
+              mediaType={cat.mediaType}
+              displayCount={displayCounts[key]}
+            />
+          );
+        })}
       </div>
     </div>
   );
