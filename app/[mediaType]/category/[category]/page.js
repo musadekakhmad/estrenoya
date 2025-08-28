@@ -4,34 +4,34 @@ import { notFound } from 'next/navigation';
 const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
-// Función para obtener los datos por tipo y categoría
+// Fungsi untuk mendapatkan data berdasarkan jenis media dan kategori
 async function getMediaByCategory(mediaType, category) {
   try {
     const res = await fetch(`${BASE_URL}/${mediaType}/${category}?api_key=${API_KEY}`);
     if (!res.ok) {
-      // Si la respuesta no es OK, lanzar un error que será capturado por el bloque catch
+      // Jika respons tidak OK, melempar error yang akan ditangkap oleh blok catch
       throw new Error(`Error: ${res.status}`);
     }
     return res.json();
   } catch (error) {
-    // Manejar el error de la solicitud y llamar a notFound()
+    // Menangani error fetch dan memanggil notFound()
     console.error("Fetch error in getMediaByCategory:", error);
     notFound();
   }
 }
 
 export default async function CategoryPage({ params }) {
-  // Destructurar los parámetros directamente, no se necesita `await`
+  // Destrukturisasi parameter secara langsung
   const { mediaType, category } = params;
   
   const data = await getMediaByCategory(mediaType, category);
 
-  // Verificar si hay datos y resultados antes de renderizar
+  // Periksa apakah data dan hasilnya ada sebelum merender
   if (!data || !data.results) {
     notFound();
   }
 
-  // Configurar el título, reemplazando los guiones bajos con espacios y poniéndolo en mayúsculas
+  // Mengatur judul, mengganti underscore dengan spasi dan mengubahnya menjadi huruf kapital
   const title = `${category.replace(/_/g, ' ').toUpperCase()} ${mediaType === 'movie' ? 'PELÍCULAS' : 'PROGRAMAS DE TV'}`;
 
   return (
@@ -42,6 +42,7 @@ export default async function CategoryPage({ params }) {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {data.results.map(item => (
+          // Memastikan mediaType diteruskan sebagai 'movie' atau 'tv'
           <MovieCard key={item.id} media={item} mediaType={mediaType} />
         ))}
       </div>
