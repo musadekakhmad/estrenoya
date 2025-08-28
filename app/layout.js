@@ -1,54 +1,59 @@
 // ---------------------------------------------------------------- //
 // Nama File: app/layout.js
-// Fungsi: Merupakan layout utama untuk seluruh halaman web,
-//         digunakan untuk mengatur elemen-elemen yang tampil
+// Fungsi: Ini adalah layout utama untuk seluruh situs web,
+//         digunakan untuk mengkonfigurasi elemen yang muncul
 //         di semua halaman, seperti header, footer, dan lebar konten.
 // ---------------------------------------------------------------- //
 
 import './globals.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import AdsterraLayoutWrapper from '../components/AdsterraLayoutWrapper'; // Impor komponen wrapper baru
-// Menghapus import 'video.js/dist/video-js.css'; dari sini
+import AdsterraLayoutWrapper from '../components/AdsterraLayoutWrapper';
 
 export const metadata = {
-  title: 'Estreno Ya | Free HD Movie & TV Show Streaming',
-  description: 'Your ultimate destination for high-quality, free movie and TV show streaming..',
-  // Meta tag Open Graph untuk Facebook
+  // Mengubah judul dan deskripsi ke bahasa Spanyol
+  title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
+  description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
+  // Menambahkan kata kunci meta untuk SEO
+  keywords: ['Estreno Ya', 'ver películas gratis', 'ver series de tv gratis', 'streaming', 'película gratis'],
+  // Open Graph meta tags for Facebook
   openGraph: {
-    title: 'Estreno Ya | Free HD Movie & TV Show Streaming',
-    description: 'Your ultimate destination for high-quality, free movie and TV show streaming..',
+    title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
+    description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
     url: 'https://estrenoya.netlify.app/',
     siteName: 'Estreno Ya',
     images: [
       {
-        url: 'https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg',
+        url: 'https://live.staticflickr.com/65535/54748591312_9316a1f42a_b.jpg',
         width: 1200,
         height: 630,
         alt: 'Estreno Ya',
       },
     ],
-    locale: 'en_US',
+    // Mengubah lokal ke bahasa Spanyol
+    locale: 'es_ES',
     type: 'website',
     // Properti khusus untuk Facebook, 'og:app_id'
-    appId: 'librasinema',
+    appId: 'cut.erna.984',
   },
-  // Meta tag Twitter Card
+  // Twitter Card meta tags
   twitter: {
     card: 'summary_large_image',
-    site: '@WatchStream123', // User Twitter Anda
+    site: '@WatchStream123', // Your Twitter user
     creator: '@WatchStream123',
-    title: 'Estreno Ya | Free HD Movie & TV Show Streaming',
-    description: 'Your ultimate destination for high-quality, free movie and TV show streaming..',
-    images: ['https://live.staticflickr.com/65535/54707174696_49edde76e3_b.jpg'], // Ganti dengan URL gambar yang sesuai
+    // Mengoreksi kesalahan ketik pada deskripsi
+    title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
+    description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
+    images: ['https://live.staticflickr.com/65535/54748591312_9316a1f42a_b.jpg'], // Replace with the appropriate image URL
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      {/* Menambahkan suppressHydrationWarning untuk mengatasi hydration error. */}
-      {/* Ini sering terjadi saat ada script pihak ketiga atau ekstensi browser yang memodifikasi tag body. */}
+    // Mengubah atribut bahasa tag html menjadi bahasa Spanyol
+    <html lang="es">
+      {/* Menambahkan suppressHydrationWarning untuk mengatasi kesalahan hidrasi. */}
+      {/* Ini sering terjadi saat skrip pihak ketiga atau ekstensi browser memodifikasi tag body. */}
       <body suppressHydrationWarning={true}>
         <AdsterraLayoutWrapper>
           {/* Kontainer utama dengan lebar maksimum */}
