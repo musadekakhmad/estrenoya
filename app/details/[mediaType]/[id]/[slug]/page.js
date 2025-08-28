@@ -1,27 +1,24 @@
-// app/details/[mediaType]/[id]/[slug]/page.js
-
 import { notFound } from 'next/navigation';
 import MovieCard from '@/components/MovieCard';
 import MovieDetailInfo from '@/components/MovieDetailInfo';
 import MovieImage from '@/components/MovieImage';
 import WatchNowButton from '@/components/WatchNowButton';
 
-// API Configuration
-const API_KEY = ''; // <-- PLEASE FILL WITH YOUR API KEY HERE
+// Konfigurasi API
+// <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
+const API_KEY = 'ISI DENGAN API KEY ANDA'; 
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ====================================================================================
-// FUNCTION TO GET DYNAMIC METADATA (Important for SEO)
-// This is a Server Component, so there is no 'use client'
+// FUNGSI UNTUK MENDAPATKAN METADATA DINAMIS (Penting untuk SEO)
 // ====================================================================================
 export async function generateMetadata({ params }) {
   const { mediaType, id } = params;
 
-  // Use try/catch for error handling
   try {
     const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
     if (!res.ok) {
-      throw new Error('Failed to fetch media data');
+      throw new Error('Gagal mengambil data media');
     }
     const data = await res.json();
     const mediaTitle = data.title || data.name;
@@ -31,7 +28,7 @@ export async function generateMetadata({ params }) {
       description: data.overview || `Información sobre ${mediaTitle} en Estreno Ya.`,
     };
   } catch (err) {
-    console.error('Error fetching metadata:', err);
+    console.error('Error al obtener metadatos:', err);
     return {
       title: 'Página no encontrada | Estreno Ya',
       description: 'La página que buscas no se ha encontrado.',
@@ -40,45 +37,44 @@ export async function generateMetadata({ params }) {
 }
 
 // ====================================================================================
-// MAIN COMPONENT (SERVER COMPONENT)
+// KOMPONEN UTAMA
 // ====================================================================================
 export default async function MediaDetailPage({ params }) {
   const { mediaType, id, slug } = params;
 
-  // Fetch data on the server side
+  // Mendapatkan data di sisi server
   const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
   if (!res.ok) {
+    console.error(`Error al obtener detalles de ${mediaType} con ID ${id}. Estado: ${res.status}`);
     notFound();
   }
   const data = await res.json();
 
-  // Fetch data for recommendations
+  // Mendapatkan data untuk rekomendasi
   const recommendationsRes = await fetch(`${BASE_URL}/${mediaType}/${id}/recommendations?api_key=${API_KEY}`);
   const recommendationsData = await recommendationsRes.json();
   const recommendations = recommendationsData?.results || [];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Display media details */}
+      {/* Menampilkan detail media */}
       <div className="relative">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30" 
           style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${data.backdrop_path})` }}
         ></div>
         <div className="relative container mx-auto p-4 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
-          {/* Component for the image (this could be a separate Client Component) */}
           <MovieImage movie={data} />
-          {/* Component for the detailed info (also could be a Client Component) */}
           <MovieDetailInfo movie={data} />
         </div>
       </div>
 
-      {/* Watch now button component (this must be a Client Component) */}
+      {/* Tombol Tonton Sekarang */}
       <WatchNowButton movieId={id} />
 
-      {/* Recommendations */}
+      {/* Rekomendasi */}
       <section className="container mx-auto p-4 md:p-8 mt-12">
-        <h2 className="text-3xl font-bold mb-6">Recommendations</h2>
+        <h2 className="text-3xl font-bold mb-6">Recomendaciones</h2>
         {recommendations.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
             {recommendations.slice(0, 12).map((media) => (
