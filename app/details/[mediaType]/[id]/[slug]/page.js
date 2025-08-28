@@ -4,21 +4,22 @@ import MovieDetailInfo from '@/components/MovieDetailInfo';
 import MovieImage from '@/components/MovieImage';
 import WatchNowButton from '@/components/WatchNowButton';
 
-// Konfigurasi API
-// <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
-const API_KEY = 'tmdb-api-proxy.argoyuwono119.workers.dev'; 
+// Configuración de la API
+const API_KEY = ''; // <-- REEMPLACE CON SU CLAVE API, atau biarkan kosong jika menggunakan proxy
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ====================================================================================
-// FUNGSI UNTUK MENDAPATKAN METADATA DINAMIS (Penting untuk SEO)
+// FUNCIÓN PARA OBTENER METADATOS DINÁMICOS (Importante para SEO)
+// Esto es un Componente de Servidor, así que no hay 'use client'
 // ====================================================================================
 export async function generateMetadata({ params }) {
   const { mediaType, id } = params;
 
+  // Usar try/catch para el manejo de errores
   try {
     const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
     if (!res.ok) {
-      throw new Error('Gagal mengambil data media');
+      throw new Error('Failed to fetch movie data');
     }
     const data = await res.json();
     const mediaTitle = data.title || data.name;
@@ -28,52 +29,52 @@ export async function generateMetadata({ params }) {
       description: data.overview || `Información sobre ${mediaTitle} en Estreno Ya.`,
     };
   } catch (err) {
-    console.error('Error al obtener metadatos:', err);
+    console.error('Error fetching metadata:', err);
     return {
-      title: 'Página no encontrada | Estreno Ya',
-      description: 'La página que buscas no se ha encontrado.',
+      title: 'Page Not Found | Estreno Ya',
+      description: 'The page you are looking for was not found.',
     };
   }
 }
 
 // ====================================================================================
-// KOMPONEN UTAMA
+// COMPONENTE PRINCIPAL (COMPONENTE DE SERVIDOR)
 // ====================================================================================
 export default async function MediaDetailPage({ params }) {
   const { mediaType, id, slug } = params;
 
-  // Mendapatkan data di sisi server
+  // Obtener datos del lado del servidor
   const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
   if (!res.ok) {
-    console.error(`Error al obtener detalles de ${mediaType} con ID ${id}. Estado: ${res.status}`);
     notFound();
   }
   const data = await res.json();
 
-  // Mendapatkan data untuk rekomendasi
-  // Menggunakan URL yang berbeda, karena URL proxy tidak mendukung endpoint rekomendasi
-  const recommendationsRes = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/recommendations?api_key=${API_KEY}`);
+  // Obtener datos para recomendaciones
+  const recommendationsRes = await fetch(`${BASE_URL}/${mediaType}/${id}/recommendations?api_key=${API_KEY}`);
   const recommendationsData = await recommendationsRes.json();
   const recommendations = recommendationsData?.results || [];
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      {/* Menampilkan detail media */}
+      {/* Mostrar detalles del medio */}
       <div className="relative">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30" 
           style={{ backgroundImage: `url(https://image.tmdb.org/t/p/original${data.backdrop_path})` }}
         ></div>
         <div className="relative container mx-auto p-4 md:p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+          {/* Componente para la imagen (puede ser un Componente Cliente separado) */}
           <MovieImage movie={data} />
+          {/* Componente para la información de detalles (también puede ser un Componente Cliente) */}
           <MovieDetailInfo movie={data} />
         </div>
       </div>
 
-      {/* Tombol Tonton Sekarang */}
+      {/* Componente del botón 'Ver ahora' (debe ser un Componente Cliente) */}
       <WatchNowButton movieId={id} />
 
-      {/* Rekomendasi */}
+      {/* Recomendaciones */}
       <section className="container mx-auto p-4 md:p-8 mt-12">
         <h2 className="text-3xl font-bold mb-6">Recomendaciones</h2>
         {recommendations.length > 0 ? (
