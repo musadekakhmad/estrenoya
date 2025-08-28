@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation';
 const API_KEY = '';
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
-// Fungsi untuk mengambil data berdasarkan mediaType dan category
+// Función para obtener datos por mediaType y categoría
 async function getMediaByCategory(mediaType, category) {
-  // Ganti URL API agar sesuai dengan kategori, bukan genre.
+  // Cambiar la URL de la API para que coincida con la categoría, no con el género.
   const res = await fetch(`${BASE_URL}/${mediaType}/${category}?api_key=${API_KEY}`);
   if (!res.ok) {
     notFound();
@@ -15,14 +15,14 @@ async function getMediaByCategory(mediaType, category) {
 }
 
 export default async function CategoryPage({ params }) {
-  // Tunggu (await) objek params sebelum mendekonstruksi propertinya.
-  // Ini diperlukan di Next.js 14 untuk mencegah error akses asinkron.
+  // Esperar el objeto params antes de desestructurar sus propiedades.
+  // Esto es necesario en Next.js 14 para evitar errores de acceso asíncrono.
   const awaitedParams = await params;
   const { mediaType, category } = awaitedParams;
   
   const data = await getMediaByCategory(mediaType, category);
 
-  const title = `${category.replace(/_/g, ' ').toUpperCase()} ${mediaType === 'movie' ? 'Movies' : 'TV Shows'}`;
+  const title = `${category.replace(/_/g, ' ').toUpperCase()} ${mediaType === 'movie' ? 'Películas' : 'Series de TV'}`;
 
   return (
     <div className="bg-gray-900 text-white min-h-screen p-4 md:p-8">
