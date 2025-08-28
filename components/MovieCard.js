@@ -1,42 +1,42 @@
-// components/MovieCard.js
 import Link from 'next/link';
 import MovieImage from './MovieImage';
 
-// A function to create a clean, SEO-friendly "slug" from a title.
+// Sebuah fungsi untuk membuat "slug" yang bersih dan ramah SEO dari judul.
 const createSlug = (title) => {
   if (!title) return '';
   return title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Remove non-alphanumeric characters.
-    .replace(/[\s_]+/g, '-') // Replace spaces and underscores with hyphens.
-    .replace(/--+/g, '-') // Replace multiple hyphens with a single one.
-    .trim(); // Remove leading/trailing spaces.
+    .replace(/[^\w\s-]/g, '') // Menghapus karakter non-alfanumerik.
+    .replace(/[\s_]+/g, '-') // Mengganti spasi dan garis bawah dengan tanda hubung.
+    .replace(/--+/g, '-') // Mengganti beberapa tanda hubung dengan satu tanda hubung.
+    .trim(); // Menghapus spasi di awal/akhir.
 };
 
 const MovieCard = ({ media, mediaType }) => {
-  // A more robust check to ensure the media object and its title are valid.
+  // Pemeriksaan yang lebih kuat untuk memastikan objek media dan judulnya valid.
   if (!media || (!media.title && !media.name)) {
-    console.error("MovieCard was rendered with an undefined 'media' or missing title/name.");
+    console.error("MovieCard dirender dengan 'media' yang tidak terdefinisi atau judul/nama yang hilang.");
     return null;
   }
 
-  // Determine the correct media type, with a fallback to 'movie' if none is provided.
+  // Tentukan jenis media yang benar, dengan fallback ke 'movie' jika tidak ada yang disediakan.
   const correctMediaType = mediaType || media.media_type || 'movie';
 
-  // Get the ID and title from the media data.
+  // Dapatkan ID dan judul dari data media.
   const id = media.id;
   const title = media.title || media.name;
   
-  // Create a slug from the title for the URL.
+  // Buat slug dari judul untuk URL.
   const slug = createSlug(title);
 
-  // Ensure the ID and slug are available before rendering.
+  // Pastikan ID dan slug tersedia sebelum rendering.
   if (!id || !slug) {
-    return null; // Don't render if the data is incomplete.
+    return null; // Jangan render jika data tidak lengkap.
   }
 
-  // Build the URL with the correct mediaType, ID, and slug.
-  const mediaUrl = `/${correctMediaType}/${id}/${slug}`;
+  // Bangun URL dengan mediaType, ID, dan slug yang benar.
+  // URL ini sekarang mengarah ke halaman detail film.
+  const mediaUrl = `/details/${correctMediaType}/${id}/${slug}`;
 
   return (
     <Link href={mediaUrl} passHref className="block rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-gray-800">
