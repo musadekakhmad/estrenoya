@@ -6,7 +6,7 @@ import WatchNowButton from '@/components/WatchNowButton';
 
 // Konfigurasi API
 // <-- PASTIKAN GANTI INI DENGAN KUNCI API ANDA
-const API_KEY = 'ISI DENGAN API KEY ANDA'; 
+const API_KEY = 'tmdb-api-proxy.argoyuwono119.workers.dev'; 
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ====================================================================================
@@ -51,7 +51,8 @@ export default async function MediaDetailPage({ params }) {
   const data = await res.json();
 
   // Mendapatkan data untuk rekomendasi
-  const recommendationsRes = await fetch(`${BASE_URL}/${mediaType}/${id}/recommendations?api_key=${API_KEY}`);
+  // Menggunakan URL yang berbeda, karena URL proxy tidak mendukung endpoint rekomendasi
+  const recommendationsRes = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}/recommendations?api_key=${API_KEY}`);
   const recommendationsData = await recommendationsRes.json();
   const recommendations = recommendationsData?.results || [];
 
