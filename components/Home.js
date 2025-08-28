@@ -1,4 +1,3 @@
-// Home.js
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -7,45 +6,6 @@ import MovieCard from '@/components/MovieCard';
 // Base URL for the API
 const API_KEY = 'ISI DENGAN API KEY ANDA'; // <-- REPLACE WITH YOUR API KEY
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
-
-// ===================================
-// Custom Hook to fetch API data
-// ===================================
-
-const useFetch = (url) => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const json = await response.json();
-      
-      // Update the data by appending the new results
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
-    } catch (err) {
-      setError(err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [url]);
-
-  useEffect(() => {
-    if (url) {
-      fetchData();
-    }
-  }, [url, fetchData]);
-
-  return { data, loading, error };
-};
 
 // ===================================
 // Home Component
@@ -116,146 +76,224 @@ export default function Home() {
   const [hasMoreAiringTodayTv, setHasMoreAiringTodayTv] = useState(true);
   const [airingTodayTvDisplayCount, setAiringTodayTvDisplayCount] = useState(6);
 
-  // Function to fetch data for a specific category
-  const fetchData = useCallback(async (category, page, setData, setLoading, setError, setHasMore) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${BASE_URL}/movie/${category}?api_key=${API_KEY}&page=${page}`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const json = await response.json();
-      
-      // Update the data by appending the new results
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
-    } catch (err) {
-      setError(err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Function to fetch data for a specific TV category
-  const fetchTvData = useCallback(async (category, page, setData, setLoading, setError, setHasMore) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${BASE_URL}/tv/${category}?api_key=${API_KEY}&page=${page}`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const json = await response.json();
-      
-      // Update the data by appending the new results
-      setData(prevData => [...prevData, ...json.results]);
-      setHasMore(json.page < json.total_pages);
-    } catch (err) {
-      setError(err.message);
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Initial data fetches on component mount
+  // Fetch data for Popular Movies
   useEffect(() => {
-    fetchData('popular', popularMoviesPage, setPopularMoviesData, setPopularMoviesLoading, setPopularMoviesError, setHasMorePopularMovies);
-    fetchData('top_rated', topRatedMoviesPage, setTopRatedMoviesData, setTopRatedMoviesLoading, setTopRatedMoviesError, setHasMoreTopRatedMovies);
-    fetchData('upcoming', upcomingMoviesPage, setUpcomingMoviesData, setUpcomingMoviesLoading, setUpcomingMoviesError, setHasMoreUpcomingMovies);
-    fetchData('now_playing', nowPlayingMoviesPage, setNowPlayingMoviesData, setNowPlayingMoviesLoading, setNowPlayingMoviesError, setHasMoreNowPlayingMovies);
-    fetchTvData('popular', popularTvPage, setPopularTvData, setPopularTvLoading, setPopularTvError, setHasMorePopularTv);
-    fetchTvData('top_rated', topRatedTvPage, setTopRatedTvData, setTopRatedTvLoading, setTopRatedTvError, setHasMoreTopRatedTv);
-    fetchTvData('on_the_air', onTheAirTvPage, setOnTheAirTvData, setOnTheAirTvLoading, setOnTheAirTvError, setHasMoreOnTheAirTv);
-    fetchTvData('airing_today', airingTodayTvPage, setAiringTodayTvData, setAiringTodayTvLoading, setAiringTodayTvError, setHasMoreAiringTodayTv);
-  }, [
-    fetchData,
-    fetchTvData,
-    popularMoviesPage,
-    topRatedMoviesPage,
-    upcomingMoviesPage,
-    nowPlayingMoviesPage,
-    popularTvPage,
-    topRatedTvPage,
-    onTheAirTvPage,
-    airingTodayTvPage
-  ]);
+    const fetchData = async () => {
+      setPopularMoviesLoading(true);
+      setPopularMoviesError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${popularMoviesPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setPopularMoviesData(prevData => [...prevData, ...json.results]);
+        setHasMorePopularMovies(json.page < json.total_pages);
+      } catch (err) {
+        setPopularMoviesError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setPopularMoviesLoading(false);
+      }
+    };
+    fetchData();
+  }, [popularMoviesPage]);
+
+  // Fetch data for Top Rated Movies
+  useEffect(() => {
+    const fetchData = async () => {
+      setTopRatedMoviesLoading(true);
+      setTopRatedMoviesError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}&page=${topRatedMoviesPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setTopRatedMoviesData(prevData => [...prevData, ...json.results]);
+        setHasMoreTopRatedMovies(json.page < json.total_pages);
+      } catch (err) {
+        setTopRatedMoviesError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setTopRatedMoviesLoading(false);
+      }
+    };
+    fetchData();
+  }, [topRatedMoviesPage]);
+
+  // Fetch data for Upcoming Movies
+  useEffect(() => {
+    const fetchData = async () => {
+      setUpcomingMoviesLoading(true);
+      setUpcomingMoviesError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}&page=${upcomingMoviesPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setUpcomingMoviesData(prevData => [...prevData, ...json.results]);
+        setHasMoreUpcomingMovies(json.page < json.total_pages);
+      } catch (err) {
+        setUpcomingMoviesError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setUpcomingMoviesLoading(false);
+      }
+    };
+    fetchData();
+  }, [upcomingMoviesPage]);
+  
+  // Fetch data for Now Playing Movies
+  useEffect(() => {
+    const fetchData = async () => {
+      setNowPlayingMoviesLoading(true);
+      setNowPlayingMoviesError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}&page=${nowPlayingMoviesPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setNowPlayingMoviesData(prevData => [...prevData, ...json.results]);
+        setHasMoreNowPlayingMovies(json.page < json.total_pages);
+      } catch (err) {
+        setNowPlayingMoviesError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setNowPlayingMoviesLoading(false);
+      }
+    };
+    fetchData();
+  }, [nowPlayingMoviesPage]);
+
+  // Fetch data for Popular TV Shows
+  useEffect(() => {
+    const fetchData = async () => {
+      setPopularTvLoading(true);
+      setPopularTvError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}&page=${popularTvPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setPopularTvData(prevData => [...prevData, ...json.results]);
+        setHasMorePopularTv(json.page < json.total_pages);
+      } catch (err) {
+        setPopularTvError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setPopularTvLoading(false);
+      }
+    };
+    fetchData();
+  }, [popularTvPage]);
+
+  // Fetch data for Top Rated TV Shows
+  useEffect(() => {
+    const fetchData = async () => {
+      setTopRatedTvLoading(true);
+      setTopRatedTvError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/tv/top_rated?api_key=${API_KEY}&page=${topRatedTvPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setTopRatedTvData(prevData => [...prevData, ...json.results]);
+        setHasMoreTopRatedTv(json.page < json.total_pages);
+      } catch (err) {
+        setTopRatedTvError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setTopRatedTvLoading(false);
+      }
+    };
+    fetchData();
+  }, [topRatedTvPage]);
+  
+  // Fetch data for On The Air TV Shows
+  useEffect(() => {
+    const fetchData = async () => {
+      setOnTheAirTvLoading(true);
+      setOnTheAirTvError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/tv/on_the_air?api_key=${API_KEY}&page=${onTheAirTvPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setOnTheAirTvData(prevData => [...prevData, ...json.results]);
+        setHasMoreOnTheAirTv(json.page < json.total_pages);
+      } catch (err) {
+        setOnTheAirTvError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setOnTheAirTvLoading(false);
+      }
+    };
+    fetchData();
+  }, [onTheAirTvPage]);
+
+  // Fetch data for Airing Today TV Shows
+  useEffect(() => {
+    const fetchData = async () => {
+      setAiringTodayTvLoading(true);
+      setAiringTodayTvError(null);
+      try {
+        const response = await fetch(`${BASE_URL}/tv/airing_today?api_key=${API_KEY}&page=${airingTodayTvPage}`);
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        const json = await response.json();
+        setAiringTodayTvData(prevData => [...prevData, ...json.results]);
+        setHasMoreAiringTodayTv(json.page < json.total_pages);
+      } catch (err) {
+        setAiringTodayTvError(err.message);
+        console.error("Fetch error:", err);
+      } finally {
+        setAiringTodayTvLoading(false);
+      }
+    };
+    fetchData();
+  }, [airingTodayTvPage]);
+
 
   // Handle load more for Movies
   const handleLoadMorePopularMovies = () => {
-    setPopularMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setPopularMoviesDisplayCount(prevCount => prevCount + 20);
     setPopularMoviesPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreTopRatedMovies = () => {
-    setTopRatedMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setTopRatedMoviesDisplayCount(prevCount => prevCount + 20);
     setTopRatedMoviesPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreUpcomingMovies = () => {
-    setUpcomingMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setUpcomingMoviesDisplayCount(prevCount => prevCount + 20);
     setUpcomingMoviesPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreNowPlayingMovies = () => {
-    setNowPlayingMoviesDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setNowPlayingMoviesDisplayCount(prevCount => prevCount + 20);
     setNowPlayingMoviesPage(prevPage => prevPage + 1);
   };
 
   // Handle load more for TV Shows
   const handleLoadMorePopularTv = () => {
-    setPopularTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setPopularTvDisplayCount(prevCount => prevCount + 20);
     setPopularTvPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreTopRatedTv = () => {
-    setTopRatedTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setTopRatedTvDisplayCount(prevCount => prevCount + 20);
     setTopRatedTvPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreOnTheAirTv = () => {
-    setOnTheAirTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setOnTheAirTvDisplayCount(prevCount => prevCount + 20);
     setOnTheAirTvPage(prevPage => prevPage + 1);
   };
   const handleLoadMoreAiringTodayTv = () => {
-    setAiringTodayTvDisplayCount(prevCount => {
-      if (prevCount === 6) {
-        return 20;
-      }
-      return prevCount + 20;
-    });
+    setAiringTodayTvDisplayCount(prevCount => prevCount + 20);
     setAiringTodayTvPage(prevPage => prevPage + 1);
   };
 
