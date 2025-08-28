@@ -89,14 +89,14 @@ const CategorySection = ({ title, data, loading, error, hasMore, onLoadMore, med
 };
 
 export default function Home() {
-  const [popularMoviesDisplayCount, setPopularMoviesDisplayCount] = useState(12);
-  const [topRatedMoviesDisplayCount, setTopRatedMoviesDisplayCount] = useState(12);
-  const [nowPlayingMoviesDisplayCount, setNowPlayingMoviesDisplayCount] = useState(12);
-  const [upcomingMoviesDisplayCount, setUpcomingMoviesDisplayCount] = useState(12);
-  const [popularTvDisplayCount, setPopularTvDisplayCount] = useState(12);
-  const [topRatedTvDisplayCount, setTopRatedTvDisplayCount] = useState(12);
-  const [onTheAirTvDisplayCount, setOnTheAirTvDisplayCount] = useState(12);
-  const [airingTodayTvDisplayCount, setAiringTodayTvDisplayCount] = useState(12);
+  const [popularMoviesDisplayCount, setPopularMoviesDisplayCount] = useState(6);
+  const [topRatedMoviesDisplayCount, setTopRatedMoviesDisplayCount] = useState(6);
+  const [nowPlayingMoviesDisplayCount, setNowPlayingMoviesDisplayCount] = useState(6);
+  const [upcomingMoviesDisplayCount, setUpcomingMoviesDisplayCount] = useState(6);
+  const [popularTvDisplayCount, setPopularTvDisplayCount] = useState(6);
+  const [topRatedTvDisplayCount, setTopRatedTvDisplayCount] = useState(6);
+  const [onTheAirTvDisplayCount, setOnTheAirTvDisplayCount] = useState(6);
+  const [airingTodayTvDisplayCount, setAiringTodayTvDisplayCount] = useState(6);
 
   const { data: popularMoviesData, loading: popularMoviesLoading, error: popularMoviesError, hasMore: hasMorePopularMovies, fetchData: fetchPopularMovies } = useFetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
   const { data: topRatedMoviesData, loading: topRatedMoviesLoading, error: topRatedMoviesError, hasMore: hasMoreTopRatedMovies, fetchData: fetchTopRatedMovies } = useFetch(`${BASE_URL}/movie/top_rated?api_key=${API_KEY}`);
@@ -108,57 +108,65 @@ export default function Home() {
   const { data: airingTodayTvData, loading: airingTodayTvLoading, error: airingTodayTvError, hasMore: hasMoreAiringTodayTv, fetchData: fetchAiringTodayTv } = useFetch(`${BASE_URL}/tv/airing_today?api_key=${API_KEY}`);
 
   const handleLoadMorePopularMovies = () => {
-    setPopularMoviesDisplayCount(prevCount => prevCount + 12);
-    if (popularMoviesDisplayCount >= popularMoviesData.length) {
+    const newCount = popularMoviesDisplayCount + 6;
+    setPopularMoviesDisplayCount(newCount);
+    if (newCount >= popularMoviesData.length && hasMorePopularMovies) {
       fetchPopularMovies();
     }
   };
 
   const handleLoadMoreTopRatedMovies = () => {
-    setTopRatedMoviesDisplayCount(prevCount => prevCount + 12);
-    if (topRatedMoviesDisplayCount >= topRatedMoviesData.length) {
+    const newCount = topRatedMoviesDisplayCount + 6;
+    setTopRatedMoviesDisplayCount(newCount);
+    if (newCount >= topRatedMoviesData.length && hasMoreTopRatedMovies) {
       fetchTopRatedMovies();
     }
   };
 
   const handleLoadMoreNowPlayingMovies = () => {
-    setNowPlayingMoviesDisplayCount(prevCount => prevCount + 12);
-    if (nowPlayingMoviesDisplayCount >= nowPlayingMoviesData.length) {
+    const newCount = nowPlayingMoviesDisplayCount + 6;
+    setNowPlayingMoviesDisplayCount(newCount);
+    if (newCount >= nowPlayingMoviesData.length && hasMoreNowPlayingMovies) {
       fetchNowPlayingMovies();
     }
   };
 
   const handleLoadMoreUpcomingMovies = () => {
-    setUpcomingMoviesDisplayCount(prevCount => prevCount + 12);
-    if (upcomingMoviesDisplayCount >= upcomingMoviesData.length) {
+    const newCount = upcomingMoviesDisplayCount + 6;
+    setUpcomingMoviesDisplayCount(newCount);
+    if (newCount >= upcomingMoviesData.length && hasMoreUpcomingMovies) {
       fetchUpcomingMovies();
     }
   };
 
   const handleLoadMorePopularTv = () => {
-    setPopularTvDisplayCount(prevCount => prevCount + 12);
-    if (popularTvDisplayCount >= popularTvData.length) {
+    const newCount = popularTvDisplayCount + 6;
+    setPopularTvDisplayCount(newCount);
+    if (newCount >= popularTvData.length && hasMorePopularTv) {
       fetchPopularTv();
     }
   };
 
   const handleLoadMoreTopRatedTv = () => {
-    setTopRatedTvDisplayCount(prevCount => prevCount + 12);
-    if (topRatedTvDisplayCount >= topRatedTvData.length) {
+    const newCount = topRatedTvDisplayCount + 6;
+    setTopRatedTvDisplayCount(newCount);
+    if (newCount >= topRatedTvData.length && hasMoreTopRatedTv) {
       fetchTopRatedTv();
     }
   };
 
   const handleLoadMoreOnTheAirTv = () => {
-    setOnTheAirTvDisplayCount(prevCount => prevCount + 12);
-    if (onTheAirTvDisplayCount >= onTheAirTvData.length) {
+    const newCount = onTheAirTvDisplayCount + 6;
+    setOnTheAirTvDisplayCount(newCount);
+    if (newCount >= onTheAirTvData.length && hasMoreOnTheAirTv) {
       fetchOnTheAirTv();
     }
   };
 
   const handleLoadMoreAiringTodayTv = () => {
-    setAiringTodayTvDisplayCount(prevCount => prevCount + 12);
-    if (airingTodayTvDisplayCount >= airingTodayTvData.length) {
+    const newCount = airingTodayTvDisplayCount + 6;
+    setAiringTodayTvDisplayCount(newCount);
+    if (newCount >= airingTodayTvData.length && hasMoreAiringTodayTv) {
       fetchAiringTodayTv();
     }
   };
@@ -264,8 +272,6 @@ export default function Home() {
         mediaType="tv"
         displayCount={airingTodayTvDisplayCount}
       />
-      
-      {/* Anda bisa menambahkan bagian lain di sini */}
     </div>
   );
 }
