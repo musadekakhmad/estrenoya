@@ -65,9 +65,11 @@ export default function Home() {
 
   const CategorySection = ({ title, hook, mediaType }) => {
     const { data, loading, error, hasMore, fetchMoreData } = hook;
-  
+    
     // Logika untuk menampilkan 6 item pertama dan kemudian 20 item
-    const displayData = data.slice(0, 6 + (hook.page - 2) * 20);
+    const displayCount = 6 + (hook.page - 1) * 20;
+    const displayData = data.slice(0, displayCount);
+
     const onLoadMore = () => {
       fetchMoreData();
     };
