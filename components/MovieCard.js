@@ -1,49 +1,49 @@
+// components/MovieCard.js
 import Link from 'next/link';
 import MovieImage from './MovieImage';
 
-// Sebuah fungsi untuk membuat "slug" yang bersih dan ramah SEO dari judul.
+// Una función para crear un "slug" limpio y amigable para SEO a partir de un título.
 const createSlug = (title) => {
   if (!title) return '';
   return title
     .toLowerCase()
-    .replace(/[^\w\s-]/g, '') // Menghapus karakter non-alfanumerik.
-    .replace(/[\s_]+/g, '-') // Mengganti spasi dan garis bawah dengan tanda hubung.
-    .replace(/--+/g, '-') // Mengganti beberapa tanda hubung dengan satu tanda hubung.
-    .trim(); // Menghapus spasi di awal/akhir.
+    .replace(/[^\w\s-]/g, '') // Eliminar caracteres no alfanuméricos.
+    .replace(/[\s_]+/g, '-') // Reemplazar espacios y guiones bajos con guiones.
+    .replace(/--+/g, '-') // Reemplazar múltiples guiones con uno solo.
+    .trim(); // Eliminar espacios iniciales/finales.
 };
 
 const MovieCard = ({ media, mediaType }) => {
-  // Pemeriksaan yang lebih kuat untuk memastikan objek media dan judulnya valid.
+  // Una comprobación más robusta para asegurar que el objeto 'media' y su título son válidos.
   if (!media || (!media.title && !media.name)) {
-    console.error("MovieCard dirender dengan 'media' yang tidak terdefinisi atau judul/nama yang hilang.");
+    console.error("MovieCard fue renderizado con un 'media' indefinido o sin título/nombre.");
     return null;
   }
 
-  // Tentukan jenis media yang benar, dengan fallback ke 'movie' jika tidak ada yang disediakan.
+  // Determinar el tipo de medio correcto, con una reserva a 'movie' si no se proporciona ninguno.
   const correctMediaType = mediaType || media.media_type || 'movie';
 
-  // Dapatkan ID dan judul dari data media.
+  // Obtener el ID y el título de los datos del medio.
   const id = media.id;
   const title = media.title || media.name;
   
-  // Buat slug dari judul untuk URL.
+  // Crear un slug a partir del título para la URL.
   const slug = createSlug(title);
 
-  // Pastikan ID dan slug tersedia sebelum rendering.
+  // Asegurarse de que el ID y el slug estén disponibles antes de renderizar.
   if (!id || !slug) {
-    return null; // Jangan render jika data tidak lengkap.
+    return null; // No renderizar si los datos están incompletos.
   }
 
-  // Bangun URL dengan mediaType, ID, dan slug yang benar.
-  // URL ini sekarang mengarah ke halaman detail film.
-  const mediaUrl = `/details/${correctMediaType}/${id}/${slug}`;
+  // Construir la URL con el correctMediaType, ID y slug.
+  const mediaUrl = `/${correctMediaType}/${id}/${slug}`;
 
   return (
     <Link href={mediaUrl} passHref className="block rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 hover:scale-105 hover:shadow-2xl bg-gray-800">
       <div className="relative w-full h-auto">
         <MovieImage
           src={media.poster_path ? `https://image.tmdb.org/t/p/w500${media.poster_path}` : 'https://placehold.co/500x750?text=No+Image'}
-          alt={`Poster for ${title}`}
+          alt={`Póster para ${title}`}
           className="w-full h-auto object-cover rounded-t-lg"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent opacity-80"></div>
