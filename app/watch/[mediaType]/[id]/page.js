@@ -1,66 +1,68 @@
 // app/watch/[mediaType]/[id]/page.js
-// PASTIKAN TIDAK ADA baris 'use client' di sini.
+// MAKE SURE THERE IS NO 'use client' line here.
 import { notFound } from 'next/navigation';
 import WatchClient from './WatchClient';
 
-// Konfigurasi API
-const API_KEY = ''; // <-- ISI DENGAN API KEY ANDA
+// API Configuration
+const API_KEY = ''; // <-- PLEASE FILL WITH YOUR API KEY HERE
 const BASE_URL = 'https://tmdb-api-proxy.argoyuwono119.workers.dev';
 
 // ====================================================================================
-// FUNGSI UNTUK MENDAPATKAN DATA (di sisi server)
+// FUNCTIONS TO GET DATA (server-side)
 // ====================================================================================
 async function getMediaDetails(mediaType, id) {
   const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
   if (!res.ok) {
-    // Jika gagal, navigasi ke halaman 404
+    // If it fails, navigate to the 404 page
     notFound();
   }
   return res.json();
 }
 
-async function getSimilarMedia(mediaType, id) {
-  const res = await fetch(`${BASE_URL}/${mediaType}/${id}/similar?api_key=${API_KEY}`);
+// New function to get a static list from TMDB
+async function getStaticListMedia(listId) {
+  const res = await fetch(`${BASE_URL}/list/${listId}?api_key=${API_KEY}`);
   if (!res.ok) {
-    // Jika gagal, kembalikan array kosong
-    return { results: [] };
+    // If it fails, return an empty array
+    return { items: [] };
   }
   return res.json();
 }
 
 // ====================================================================================
-// KOMPONEN UTAMA HALAMAN PLAYER (SERVER COMPONENT)
+// MAIN PLAYER PAGE COMPONENT (SERVER COMPONENT)
 // ====================================================================================
 export default async function Page({ params }) {
-  // PERBAIKAN: Gunakan 'await params' untuk mengatasi error Next.js
+  // FIX: Use 'await params' to handle the Next.js error
   const { mediaType, id } = await params;
 
   try {
-    const [detailsData, similarData] = await Promise.all([
+    const [detailsData, staticListData] = await Promise.all([
       getMediaDetails(mediaType, id),
-      getSimilarMedia(mediaType, id),
+      // Using TMDB static list with ID 143347
+      getStaticListMedia(143347),
     ]);
 
-    // Meneruskan semua data yang diperlukan ke komponen klien
+    // Pass all necessary data to the client component
     return (
       <WatchClient
         mediaType={mediaType}
         id={id}
         initialDetails={detailsData}
-        initialSimilarMedia={similarData.results}
+        initialSimilarMedia={staticListData.items}
       />
     );
   } catch (error) {
-    console.error("Gagal mengambil data di sisi server:", error);
+    console.error("Failed to fetch data on the server side:", error);
     notFound();
   }
 }
 
 // ====================================================================================
-// FUNGSI UNTUK MENDAPATKAN METADATA DINAMIS (Penting untuk SEO)
+// FUNCTION TO GET DYNAMIC METADATA (Important for SEO)
 // ====================================================================================
 export async function generateMetadata({ params }) {
-  // PERBAIKAN: Gunakan 'await params' untuk mengatasi error Next.js
+  // FIX: Use 'await params' to handle the Next.js error
   const { mediaType, id } = await params;
 
   const res = await fetch(`${BASE_URL}/${mediaType}/${id}?api_key=${API_KEY}`);
@@ -70,8 +72,8 @@ export async function generateMetadata({ params }) {
     return {};
   }
 
-  const title = `${details.title || details.name} | Estrenoya`;
-  const description = details.overview || 'Tujuan utama Anda untuk streaming film dan acara TV gratis berkualitas tinggi.';
+  const title = `${details.title || details.name} | Estreno Ya`;
+  const description = details.overview || 'Tu centro de streaming gratuito y de alta calidad para películas y programas de TV.';
   const imageUrl = details.poster_path
     ? `https://image.tmdb.org/t/p/original${details.poster_path}`
     : 'https://placehold.co/1200x630/000000/FFFFFF?text=Estrenoya';
@@ -83,7 +85,7 @@ export async function generateMetadata({ params }) {
       title,
       description,
       url: `https://estrenoya.netlify.app/${mediaType}/${id}`,
-      siteName: 'Estrenoya',
+      siteName: 'Estreno Ya',
       images: [
         {
           url: imageUrl,
@@ -92,7 +94,7 @@ export async function generateMetadata({ params }) {
           alt: title,
         },
       ],
-      locale: 'en_US',
+      locale: 'es_ES',
       type: 'website',
     },
     twitter: {
