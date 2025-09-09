@@ -13,13 +13,13 @@ import AdsterraLayoutWrapper from '../components/AdsterraLayoutWrapper';
 export const metadata = {
   // Mengubah judul dan deskripsi ke bahasa Spanyol
   title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
-  description: 'Tu destino final para ver películas y series de TV de alta kualitas en streaming.',
+  description: 'Tu destino final untuk ver películas y series de TV de alta calidad en streaming.',
   // Menambahkan kata kunci meta untuk SEO
   keywords: ['Estreno Ya', 'ver películas gratis', 'ver series de tv gratis', 'streaming', 'película gratis'],
   // Open Graph meta tags for Facebook
   openGraph: {
     title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
-    description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
+    description: 'Tu destino final untuk ver películas y series de TV de alta calidad en streaming.',
     url: 'https://estrenoya.netlify.app/',
     siteName: 'Estreno Ya',
     images: [
@@ -43,7 +43,7 @@ export const metadata = {
     creator: '@WatchStream123',
     // Mengoreksi kesalahan ketik pada deskripsi
     title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
-    description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
+    description: 'Tu destino final untuk ver películas y series de TV de alta calidad en streaming.',
     images: ['https://live.staticflickr.com/65535/54748591312_9316a1f42a_b.jpg'], // Replace with the appropriate image URL
   },
 };
@@ -61,7 +61,7 @@ export default function RootLayout({ children }) {
           <div className="mx-auto max-w-7xl">
             <Header />
             {children}
-            {/* Container for the native banner ad moved here, above the footer */}
+            {/* Native Banner Container */}
             <div id="container-5b6b1243436b7461212423422d0434dc"></div>
             <Footer />
           </div>
