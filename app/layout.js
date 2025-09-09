@@ -13,7 +13,7 @@ import AdsterraLayoutWrapper from '../components/AdsterraLayoutWrapper';
 export const metadata = {
   // Mengubah judul dan deskripsi ke bahasa Spanyol
   title: 'Estreno Ya | Ver Películas y Series de TV en Streaming Gratis',
-  description: 'Tu destino final para ver películas y series de TV de alta calidad en streaming.',
+  description: 'Tu destino final para ver películas y series de TV de alta kualitas en streaming.',
   // Menambahkan kata kunci meta untuk SEO
   keywords: ['Estreno Ya', 'ver películas gratis', 'ver series de tv gratis', 'streaming', 'película gratis'],
   // Open Graph meta tags for Facebook
