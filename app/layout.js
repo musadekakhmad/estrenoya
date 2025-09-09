@@ -61,6 +61,8 @@ export default function RootLayout({ children }) {
           <div className="mx-auto max-w-7xl">
             <Header />
             {children}
+            {/* Container for the native banner ad moved here, above the footer */}
+            <div id="container-5b6b1243436b7461212423422d0434dc"></div>
             <Footer />
           </div>
         </AdsterraLayoutWrapper>
