@@ -9,6 +9,7 @@ import './globals.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdsterraLayoutWrapper from '../components/AdsterraLayoutWrapper';
+import Script from 'next/script';
 
 export const metadata = {
   // Mengubah judul dan deskripsi ke bahasa Spanyol
@@ -63,6 +64,12 @@ export default function RootLayout({ children }) {
             {children}
             {/* Native Banner Container */}
             <div id="container-5b6b1243436b7461212423422d0434dc"></div>
+            {/* Native Banner Script */}
+            <Script
+              async
+              data-cfasync="false"
+              src="//discreetisabella.com/5b6b1243436b7461212423422d0434dc/invoke.js"
+            />
             <Footer />
           </div>
         </AdsterraLayoutWrapper>
